@@ -1,0 +1,29 @@
+body {
+	height: 100% !important;
+}
+
+#map {
+	height: 100% !important;
+	background:#ccc;
+}
+
+.mapControl {
+	margin:5px;
+}
+
+#fetchDataModal textarea {
+	width: 100%;
+	height: 200px;
+} 
+
+/* custum tooltip color */
+.custom-tooltip + .tooltip  > .tooltip-inner {
+	background-color: #37b;
+}
+.custom-tooltip + .tooltip > .tooltip-arrow {
+	border-bottom-color: #37b;
+}
+
+#visualizeDataModal .modal-body{
+	overflow-x : auto;
+}
