@@ -3,6 +3,7 @@
     var defaultLocation = {lat:36.776171,lng:3.058329}; // Place Emir Abdelkader, Alger
     var map;
     var markers=[];
+    var infoWindows=[];
     var data =[];
 
     /* regular expressions */
@@ -40,7 +41,7 @@
         $("#fetchDataBtn").click( openFetchDataModal );
         $("#visualizeDataBtn").click( openVisualizeDataModal );
         $("#removeDataBtn").click( removeData );
-        $("#showDataOnMap").click( showDataOnMap );
+        $("#showDataOnMap").click( function(){showDataOnMap($("#dataVisualizationTable"));} );
         $("#fetchDataOKBtn").click( function(){
             $("#fetchDataOKBtn").button('processing');
             data = fetchData($("#fetchDataModalElement"), $("#separator").val());
@@ -247,11 +248,64 @@
       }
 
       function showDataOnMap( $srcElement ){
-        if (!data.specificColumns.longitude || !data.specificColumns.latitude) {
-          alert("Specify Longitude and Latitude columns first");
+        var bounds = new google.maps.LatLngBounds();
+        var $rows = $srcElement.find("tbody [data-role='selectRow']:checked").parents("tr");
+
+        if (!$rows.length) {
+          alert("No data to display.");
           return;
         }
 
+        if (!data.specificColumns.longitude || !data.specificColumns.latitude) {
+          alert("You should specify Longitude and Latitude columns.");
+          return;
+        }
+
+        $("#visualizeDataModal").modal("hide");        
+        clearMarkers();
+        
+        $rows.each(
+          function(){
+            var dataTR = $(this).data("data");
+            var description = dataTR[ data.specificColumns.description ];
+            var label = dataTR[ data.specificColumns.label ];
+            var icon = label ?  new google.maps.MarkerImage(
+        "http://chart.googleapis.com/chart?chst=d_bubble_text_small_withshadow&chld=bb|" + encodeURIComponent(label) + "|3377BB|FFFFFF",
+        null, null, new google.maps.Point(0, 42)) : null;
+            var position = new google.maps.LatLng(dataTR[ data.specificColumns.latitude ],dataTR[ data.specificColumns.longitude ]);
+            var marker = new google.maps.Marker({
+              position:position,
+              icon: icon,
+              map: map
+            });
+            var infoWindow = description ? new google.maps.InfoWindow({content:description}) : null;
+
+            bounds.extend(position);
+
+            marker.setVisible(true);
+            if (infoWindow) {
+              marker.addListener('click', function() {infoWindow.open(map, marker);});
+              infoWindow.open(map,marker);
+              infoWindows.push( infoWindow ); // All infoWindows initialy opened
+            }
+            markers.push( marker );
+          });
+        map.fitBounds(bounds);
+      }
+
+      function clearMarkers(){
+        $.each( infoWindows,
+          function(index,infoWindow){
+            infoWindow.close();
+          });
+        infoWindows = [];
+
+        $.each(markers,
+          function(index,marker){
+            marker.setVisible(false);
+            marker.setMap(null);
+          });
+        markers=[];
       }
 
       function openVisualizeDataModal(){
@@ -259,10 +313,9 @@
       }
 
       function removeData(){
-        markers=[];
-        schema = [];
         data =[];
         $("#visualizeDataBtn").addClass('disabled');
+        clearMarkers();
       }
 
       /**** Initialization ****/
