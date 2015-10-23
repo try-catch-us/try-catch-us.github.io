@@ -27,3 +27,9 @@ body {
 #visualizeDataModal .modal-body{
 	overflow-x : auto;
 }
+
+.dropdown-menu>li>a:hover,
+.dropdown-menu>li>a:focus {
+	background: #37b;
+	color:#fff;
+}
