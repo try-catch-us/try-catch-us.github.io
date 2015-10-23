@@ -1,6 +1,6 @@
 (function(){
 
-    var defaultLocation = {lat:36.776171,lng:3.058329}; // Place Emir Abdelkader, Alger
+    var defaultLocation = {lat:48.569094,lng:7.777214}; // This is my home
     var map;
     var markers=[];
     var infoWindows=[];
@@ -37,14 +37,20 @@
                 }
             });
 
+            // toolTips initialization
         $("[data-toggle='tooltip']").tooltip();
+
+            // Map controls
         $("#fetchDataBtn").click( openFetchDataModal );
         $("#visualizeDataBtn").click( openVisualizeDataModal );
         $("#removeDataBtn").click( removeData );
+
+
+            // Modal initialization
         $("#showDataOnMap").click( function(){showDataOnMap($("#dataVisualizationTable"));} );
         $("#fetchDataOKBtn").click( function(){
             $("#fetchDataOKBtn").button('processing');
-            data = fetchData($("#fetchDataModalElement"), $("#separator").val());
+            data = fetchData($("#fetchDataModalElement").val(), $("#separator").val());
             buildDataVisualization( $("#dataVisualizationTable") );
             $("#fetchDataOKBtn").button("reset");
             $("#fetchDataModal").modal("hide");
@@ -66,7 +72,6 @@
                                                   SelectTableRows($(this).parents('table'),$(this).prop("checked"));
                                                 })
 
-
         $("#fetchDataModal").on("shown.bs.modal",function(){
           $(this).find("textarea").val("").focus();
           $("#separator").val("COMMA");
@@ -75,7 +80,7 @@
     }
 
 
-      /** We overwrite confirm function for a non blocking modal confirmation */ 
+      /** confirm is a non blocking modal confirmation popup */ 
       var confirmInitialized = false;
       function confirm(message){
         var yes = function(){}, no = function(){};
@@ -142,35 +147,31 @@
         return typedValue;
       }
 
-      function addMapControls(map,$ctrls){
-        $ctrls.each(
-            function(){
-                map.controls[ $(this).data("position") || google.maps.ControlPosition.TOP_LEFT].push( $(this).get(0));
-            });
-      }
-
       function openFetchDataModal(){
         if(data.length) {
-          confirm("Data available. Would you remove current data?")
+          confirm("Data available. Would you delete current data?")
             .yes(function(){removeData();$("#fetchDataModal").modal("show");})
             .no(openVisualizeDataModal); // show current data
         }
         else $("#fetchDataModal").modal("show");
       }
 
-      function fetchData( $srcElement, separator ){
-        var lines = $srcElement.val().trim().split("\n");
+      // read csv text
+      // returns an Array[] of read data{}.
+      // The .schema property of the returned value gives the schema
+      function fetchData( csvData, separator ){
+        var lines = csvData.split("\n");
         var schema = [];
         var data=[];
 
-        /* build schema */
+        /* build schema from first line */
         var fields = lines[0].split( separatorRegexp[separator] );
         $(fields).each(
           function(index,value){
             schema.push( {name:value} );
         });
 
-        /* build data */
+        /* build data from the other lines*/
         $(lines.slice(1)).each(
           function(index,line){
             var dataObj = {};
@@ -187,6 +188,8 @@
         return data;
       }
 
+        // $destElement is a Table HTMLElement
+        //  Fill the table with teh data
       function buildDataVisualization( $destElement ){
         var $body = $destElement.find("tbody").html("");
         var $header = $("<tr></tr>");
@@ -226,7 +229,8 @@
               ;
           });
       }
-
+        // from the value of a field
+        // return a HTMLTableCellElement
       function buildTableCell(data){
         var $td = $("<td></td>")
 
@@ -321,6 +325,8 @@
       /**** Initialization ****/
       $(function(){
         navInitialization();
+        
+        // create the map centred on a default position
         map = new google.maps.Map($("#map").get(0), {
                     center: defaultLocation,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -329,7 +335,14 @@
                     draggable: true,
                     noClear: true
                  });
-        addMapControls(map, $("[data-role='map-ctrl']"));
+        
+        // add map controls
+        $("[data-role='map-ctrl']").each(
+            function(){
+                map.controls[ $(this).data("position") || google.maps.ControlPosition.TOP_LEFT].push( $(this).get(0));
+            });
+      }
+
       });
 
 })();
