@@ -4,17 +4,24 @@
     var map;
     var markers=[];
     var data =[];
+
+    /* regular expressions */
     var separatorRegexp = {"COMMA":/\s*\,\s*/g, "SEMICOLON":/\s*\;\s*/g,"TAB":/\t/g};
     var floatRegexp = /^[-+]?[0-9]*\.?[0-9]+$/g;
     var integerRegexp = /^[-+]?[0-9]+$/g;
+    var imageRegexp = /\.(jpeg|jpg|tiff|gif|png|webp|svg)$/g;
+    var linkRegexp = /^https?\:\/\//g;
 
+
+    // All HTML initialization /events configuration of the page
+    function navInitialization(){
         // sidebar menu
         $("#menu-toggle,#menu-close").click(function(e) {
             e.preventDefault();
             $("#sidebar-wrapper").toggleClass("active");
         });
 
-        $(function() { // Scrolls to menu item 
+         // Scrolls to menu item 
             $('a[href*=#]:not([href=#])').click(function() {
                 if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') || location.hostname == this.hostname) {
 
@@ -28,18 +35,54 @@
                     }
                 }
             });
+
+        $("[data-toggle='tooltip']").tooltip();
+        $("#fetchDataBtn").click( openFetchDataModal );
+        $("#visualizeDataBtn").click( openVisualizeDataModal );
+        $("#removeDataBtn").click( removeData );
+        $("#showDataOnMap").click( showDataOnMap );
+        $("#fetchDataOKBtn").click( function(){
+            $("#fetchDataOKBtn").button('processing');
+            data = fetchData($("#fetchDataModalElement"), $("#separator").val());
+            buildDataVisualization( $("#dataVisualizationTable") );
+            $("#fetchDataOKBtn").button("reset");
+            $("#fetchDataModal").modal("hide");
+            $("#visualizeDataBtn").removeClass('disabled');
+            $("#visualizeDataModal").modal("show");       
+          } );
+        $("#dataVisualizationTable")
+          .on("click","a[data-role='setLongitude']", function(){data.specificColumns.longitude=$(this).parents("th").data("name");} )
+          .on("click","a[data-role='setLatitude']", function(){data.specificColumns.latitude=$(this).parents("th").data("name");} )
+          .on("click","a[data-role='setLabel']", function(){data.specificColumns.label=$(this).parents("th").data("name");} )
+          .on("click","a[data-role='setDescription']", function(){data.specificColumns.description=$(this).parents("th").data("name");} )
+          .on("click","a[data-role='sortAsc']", function(){sortTable($("#dataVisualizationTable"),$(this).parents("th").data("name"), +1 );} )
+          .on("click","a[data-role='sortDesc']", function(){sortTable($("#dataVisualizationTable"),$(this).parents("th").data("name"), -1 );} )
+          .on("click","[data-role='selectRow']", function(){
+                                                  if ($(this).prop("checked")) $(this).parents('tr').removeClass('warning');
+                                                  else $(this).parents('tr').addClass('warning');
+                                                })
+          .on("click","[data-role='selectAll']", function(){
+                                                  SelectTableRows($(this).parents('table'),$(this).prop("checked"));
+                                                })
+
+
+        $("#fetchDataModal").on("shown.bs.modal",function(){
+          $(this).find("textarea").val("").focus();
+          $("#separator").val("COMMA");
+          $("#fetchDataOKBtn").button('reset');
         });
+    }
 
 
       /** We overwrite confirm function for a non blocking modal confirmation */ 
-      var confirmInitialised = false;
+      var confirmInitialized = false;
       function confirm(message){
         var yes = function(){}, no = function(){};
 
-        if (!confirmInitialised) {
+        if (!confirmInitialized) {
           $("#confirmCancelBtn").click( function(){ closed=true; $("#confirmModal").modal("hide"); no(); } );
           $("#confirmOKBtn").click( function(){ closed=true; $("#confirmModal").modal("hide"); yes(); }) ;
-          confirmInitialised = true;
+          confirmInitialized = true;
         }
         $("#confirmModal .modal-body").html(message || "");
         $("#confirmModal").modal("show");
@@ -72,11 +115,21 @@
         return;
       }
 
-      function position2Latlng(position){
-        return {lat:position.coords.latitude,lng:position.coords.longitude};
+      // select all table rows if checked=true
+      // unselect all table rows if checked=false
+      function SelectTableRows($srcElement, checked){
+        $srcElement.find("tbody tr").each(
+          function(){
+            if (checked){
+              $(this).removeClass("warning").find("td:first input").prop("checked",true);
+            }
+            else{
+              $(this).addClass("warning").find("td:first input").prop("checked",false);
+            }
+          });
       }
 
-        // recognize integers and floats. Other strings are returned as they are
+      // recognize integers and floats. Other strings are returned as they are
       function typedValue( value ){
         var typedValue;
 
@@ -97,7 +150,9 @@
 
       function openFetchDataModal(){
         if(data.length) {
-          confirm("Clear current data?").yes(function(){removeData();$("#fetchDataModal").modal("show");});
+          confirm("Data available. Would you remove current data?")
+            .yes(function(){removeData();$("#fetchDataModal").modal("show");})
+            .no(openVisualizeDataModal); // show current data
         }
         else $("#fetchDataModal").modal("show");
       }
@@ -137,7 +192,7 @@
 
         // build table header and dropdowns
         $destElement.find("thead").html("").append($header);
-        $header.append( $("<th title='Show/hide marker'></th>") );
+        $header.append( $("<th title='Show/hide markers'><input type='checkbox' checked data-role='selectAll' /></th>") );
         $(data.schema).each(
            function(index,element){
             var $th=$("<th class='dropdown'></th>").data("name",element.name);
@@ -174,10 +229,10 @@
       function buildTableCell(data){
         var $td = $("<td></td>")
 
-        if (data.match && data.match(/\.(jpeg|jpg|tiff|gif|png|webp|svg)$/g)) { //image
+        if (data.match && data.match(imageRegexp)) { //image
           $td.append( $("<img class='img-thumbnail img-responsive' src='"+data+"'/>"));
         }
-        else if (data.match && data.match(/^https?\:\/\//g)) { //link
+        else if (data.match && data.match(linkRegexp)) { //link
           $td.append( $("<a href='"+data+"' target='_blank'>visit</a>"));
         }
         else $td.text( data );
@@ -186,7 +241,7 @@
 
       function buildSelectionCell(id){
         var $td = $("<td></td>")
-        $td.append( $("<input type='checkbox' checked />").data("id",id) );
+        $td.append( $("<input type='checkbox' checked data-role='selectRow'/>").data("id",id) );
 
         return $td;
       }
@@ -199,7 +254,7 @@
 
       }
 
-      function visualizeData(){
+      function openVisualizeDataModal(){
         if (data.length) $("#visualizeDataModal").modal("show");
       }
 
@@ -212,6 +267,7 @@
 
       /**** Initialization ****/
       $(function(){
+        navInitialization();
         map = new google.maps.Map($("#map").get(0), {
                     center: defaultLocation,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -221,36 +277,6 @@
                     noClear: true
                  });
         addMapControls(map, $("[data-role='map-ctrl']"));
-        $("[data-toggle='tooltip']").tooltip();
-        $("#fetchDataBtn").click( openFetchDataModal );
-        $("#visualizeDataBtn").click( visualizeData );
-        $("#removeDataBtn").click( removeData );
-        $("#showDataOnMap").click( showDataOnMap );
-        $("#fetchDataOKBtn").click( function(){
-            $("#fetchDataOKBtn").button('processing');
-            data = fetchData($("#fetchDataModalElement"), $("#separator").val());
-            buildDataVisualization( $("#dataVisualizationTable") );
-            $("#fetchDataOKBtn").button("reset");
-            $("#fetchDataModal").modal("hide");
-            $("#visualizeDataBtn").removeClass('disabled');
-            $("#visualizeDataModal").modal("show");       
-          } );
-        $("#dataVisualizationTable")
-          .on("click","a[data-role='setLongitude']", function(){data.specificColumns.longitude=$(this).parents("th").data("name");} )
-          .on("click","a[data-role='setLatitude']", function(){data.specificColumns.latitude=$(this).parents("th").data("name");} )
-          .on("click","a[data-role='setLabel']", function(){data.specificColumns.label=$(this).parents("th").data("name");} )
-          .on("click","a[data-role='setDescription']", function(){data.specificColumns.description=$(this).parents("th").data("name");} )
-          .on("click","a[data-role='sortAsc']", function(){sortTable($("#dataVisualizationTable"),$(this).parents("th").data("name"), +1 );} )
-          .on("click","a[data-role='sortDesc']", function(){sortTable($("#dataVisualizationTable"),$(this).parents("th").data("name"), -1 );} )
-          .on("click","input[type='checkbox']", function(){
-                                                  if ($(this).prop("checked")) $(this).parents('tr').removeClass('warning');
-                                                  else $(this).parents('tr').addClass('warning');
-                                                });
+      });
 
-        $("#fetchDataModal").on("shown.bs.modal",function(){
-          $(this).find("textarea").val("").focus();
-          $("#separator").val("COMMA");
-          $("#fetchDataOKBtn").button('reset');
-        });
-      })
 })();
