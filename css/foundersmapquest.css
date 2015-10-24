@@ -37,3 +37,13 @@ body {
 header h1 {
 	color: #009;
 }
+
+.forkme {
+	position:absolute;
+	width:82px;
+	height: 144px;
+	background: url("../img/forkme.png") no-repeat;
+	z-index: 1000;
+	top:0;
+	left:50px;
+}
