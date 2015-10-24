@@ -37,16 +37,15 @@ define(['csv'], function( csv ) {
 
   }
 
-  exports.showData = function(){
+  exports.showData = function( data, specificColumns ){
         var bounds = new google.maps.LatLngBounds();
-        var data = csv.data();
 
         if (!data.length) {
           showAlert("No data to display.", 5000);
           return;
         }
 
-        if (!csv.specificColumn('longitude') || !csv.specificColumn('latitude')) {
+        if (!specificColumns.longitude || !specificColumns.latitude) {
           showAlert("You should specify Longitude and Latitude columns.", 5000);
           return;
         }
@@ -56,26 +55,25 @@ define(['csv'], function( csv ) {
         
         $.each( data,
           function( index, row ){
-            var description = row[ csv.specificColumn('description') ];
-            var label = row[ csv.specificColumn('label') ];
+            var description = row[ specificColumns.description ];
+            var label = row[ specificColumns.label ];
             var icon = label ?  new google.maps.MarkerImage(
         "http://chart.googleapis.com/chart?chst=d_bubble_text_small_withshadow&chld=bb|" + encodeURIComponent(label) + "|3377BB|FFFFFF",
         null, null, new google.maps.Point(0, 42)) : null;
-            var position = new google.maps.LatLng(row[ csv.specificColumn('latitude') ],row[ csv.specificColumn('longitude') ]);
+            var position = new google.maps.LatLng(row[ specificColumns.latitude ],row[ specificColumns.longitude ]);
             var marker = new google.maps.Marker({
               position:position,
               icon: icon,
               map: map
             });
-            var infoWindow = description ? new google.maps.InfoWindow({content:description}) : null;
+            var infoWindow = description ? new google.maps.InfoWindow({content:csv.tableCell(description).prop('innerHTML')}) : null;
 
             bounds.extend(position);
 
             marker.setVisible(true);
             if (infoWindow) {
               marker.addListener('click', function() {infoWindow.open(map, marker);});
-              infoWindow.open(map,marker);
-              infoWindows.push( infoWindow ); // All infoWindows initialy opened
+              infoWindows.push( infoWindow ); // All infoWindows initialy closed
             }
             markers.push( marker );
           });

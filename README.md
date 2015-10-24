@@ -14,5 +14,15 @@ When scrolling to the map (or choosing the option in the side bar menu) you have
 ## Next milestone ##
 The next thing to do is to enhance the mobile version of this site, that is not as user friendly that it should be.
 
+## modules ##
+This web site is built with ```require.js``` and AMD. The available modules are :
+ - **bootable.js** : a Bootstrap table component
+ - **csv.js** : a module that handles csv data
+ - **map.js** : the module handling Google Maps component
+ - **types.js** : a collection of simple and rich content types recognition.
+ - **nav.js** : the controler module that handels all HTML events in the page
+ - **domReady.js** : a CommonJs version of .onLoad()
+ - **modals.js** : a module that offers a non blocking version of confirm (and alert) command
+
 ## Contibutors ##
  * [Samir ROUABHI](mailto:rouabhi@gmail.com)

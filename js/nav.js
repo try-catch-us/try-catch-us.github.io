@@ -52,7 +52,7 @@ define(['domReady','csv','bootable','map','modals' ],function( domeady, csv, boo
 
 
           // Modal initialization
-      $("#showDataOnMap").click( function(){map.showData( myTable.selectedData(), myTable.columns() );} );
+      $("#showDataOnMap").click( function(){map.showData( myTable.selectedData(), csv.specificColumns() );} );
       $("#fetchDataOKBtn").click( function(){
           $("#fetchDataOKBtn").button('processing');
           csv.fetch($("#fetchDataModalElement").val(), $("#separator").val());

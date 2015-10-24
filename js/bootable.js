@@ -13,8 +13,8 @@
 
 define(['types','csv'], function( types, csv ) {
 
-    // $destElement is a Table HTMLElement
-    //  Fill the table with teh data
+    // $table is a HTMLTableElement
+    //  Fill the table with the data and adds all controls
 	function constructor( $table, data ){
         var $body = $table.find("tbody").html("");
         var $header = $("<tr></tr>");
@@ -50,7 +50,7 @@ define(['types','csv'], function( types, csv ) {
               $tr.append( selectionCell( id ) );
               $(data.schema).each(
                  function(index,field){
-                  $tr.append( tableCell( record[field.name] ) );
+                  $tr.append( csv.tableCell( record[field.name] ) );
                  });
               ;
           });
@@ -82,28 +82,12 @@ define(['types','csv'], function( types, csv ) {
 
       }
 
-        // from the value of a field
-        // returns a HTMLTableCellElement
-      function tableCell(content){
-        var $td = $("<td></td>")
-
-        if (content.match && content.match(types.regex.image)) { //image
-          $td.append( $("<img class='img-thumbnail img-responsive' src='"+content+"'/>"));
-        }
-        else if (content.match && content.match(types.regex.link)) { //link
-          $td.append( $("<a href='"+content+"' target='_blank'>visit</a>"));
-        }
-        else $td.text( content );
-        return $td;
-      }
-
       function selectionCell(id){
         var $td = $("<td></td>")
         $td.append( $("<input type='checkbox' checked data-role='selectRow'/>").data("id",id) );
 
         return $td;
       }
-
 
       // sort a table element ASC againt a data field
       // dir is +1 for ascending and -1 for descending
