@@ -12,8 +12,6 @@ When scrolling to the map (or choosing the option in the side bar menu) you have
  - "*Delete data*" : By clicking here, you delete all the entered data and displayed markers on the map.
 
 ## Next milestone ##
-One thing to do is to refactor the site into AML to make it easier to update. Notice that this will be bad for server load as it will have many requests for *.js files instead of one request.
-
 The next thing to do is to enhance the mobile version of this site, that is not as user friendly that it should be.
 
 ## Contibutors ##
