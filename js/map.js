@@ -2,7 +2,7 @@
  map.js
  ***/
 
-define(function(  ) {
+define(['csv'], function( csv ) {
   var exports = {};
 
   var map;
@@ -37,15 +37,16 @@ define(function(  ) {
 
   }
 
-  exports.showData = function( data, columns ){
+  exports.showData = function(){
         var bounds = new google.maps.LatLngBounds();
+        var data = csv.data();
 
         if (!data.length) {
           showAlert("No data to display.", 5000);
           return;
         }
 
-        if (!columns.longitude || !columns.latitude) {
+        if (!csv.specificColumn('longitude') || !csv.specificColumn('latitude')) {
           showAlert("You should specify Longitude and Latitude columns.", 5000);
           return;
         }
@@ -55,12 +56,12 @@ define(function(  ) {
         
         $.each( data,
           function( index, row ){
-            var description = row[ columns.description ];
-            var label = row[ columns.label ];
+            var description = row[ csv.specificColumn('description') ];
+            var label = row[ csv.specificColumn('label') ];
             var icon = label ?  new google.maps.MarkerImage(
         "http://chart.googleapis.com/chart?chst=d_bubble_text_small_withshadow&chld=bb|" + encodeURIComponent(label) + "|3377BB|FFFFFF",
         null, null, new google.maps.Point(0, 42)) : null;
-            var position = new google.maps.LatLng(row[ columns.latitude ],row[ columns.longitude ]);
+            var position = new google.maps.LatLng(row[ csv.specificColumn('latitude') ],row[ csv.specificColumn('longitude') ]);
             var marker = new google.maps.Marker({
               position:position,
               icon: icon,

@@ -11,7 +11,7 @@
 	 - you can choose a column a label, description, longitude and latitude 
  ***/
 
-define(['types'], function( types ) {
+define(['types','csv'], function( types, csv ) {
 
     // $destElement is a Table HTMLElement
     //  Fill the table with teh data
@@ -65,10 +65,10 @@ define(['types'], function( types ) {
 	      	// This is done once, Even if the table is refield with data.
 	      function initialize( $table ){
 	        $table
-	          .on("click","a[data-role='setLongitude']", function(){data.specificColumns.longitude=$(this).parents("th").data("name");} )
-	          .on("click","a[data-role='setLatitude']", function(){data.specificColumns.latitude=$(this).parents("th").data("name");} )
-	          .on("click","a[data-role='setLabel']", function(){data.specificColumns.label=$(this).parents("th").data("name");} )
-	          .on("click","a[data-role='setDescription']", function(){data.specificColumns.description=$(this).parents("th").data("name");} )
+	          .on("click","a[data-role='setLongitude']", function(){csv.specificColumn('longitude', $(this).parents("th").data("name"));} )
+	          .on("click","a[data-role='setLatitude']", function(){csv.specificColumn('latitude', $(this).parents("th").data("name"));} )
+	          .on("click","a[data-role='setLabel']", function(){csv.specificColumn('label', $(this).parents("th").data("name"));} )
+	          .on("click","a[data-role='setDescription']", function(){csv.specificColumn('description',$(this).parents("th").data("name"));} )
 	          .on("click","a[data-role='sortAsc']", function(){sortTable($table,$(this).parents("th").data("name"), +1 );} )
 	          .on("click","a[data-role='sortDesc']", function(){sortTable($table,$(this).parents("th").data("name"), -1 );} )
 	          .on("click","[data-role='selectRow']", function(){

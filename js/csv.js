@@ -52,6 +52,10 @@ define(['types'], function( types ) {
       }
 
       exports.data = function(){return data;}
+      exports.specificColumn = function( type, fieldname ){ // type is 'label','longitude','latitude' or 'description'
+               if (typeof fieldname == "undefined") return data.specificColumns[type];
+               else data.specificColumns[type] = fieldname;
+             }
       exports.clear = function(){data=[];}
 
 	return exports;
