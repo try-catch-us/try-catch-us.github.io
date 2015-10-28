@@ -14,6 +14,8 @@ When scrolling to the map (or choosing the option in the side bar menu) you have
 ## Next milestone ##
 The next thing to do is to enhance the mobile version of this site, that is not as user friendly that it should be.
 
+Another thing to do, is to replace the default position shown initially by geolocated position.
+
 ## modules ##
 This web site is built with ```require.js``` and AMD. The available modules are :
  - **bootable.js** : a Bootstrap table component
