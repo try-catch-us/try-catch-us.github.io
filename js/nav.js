@@ -6,7 +6,9 @@ define(['domReady','csv','bootable','map','modals' ],function( domeady, csv, boo
   var myTable;
 
   function openVisualizeDataModal(){
-    if (csv.data().length) $("#visualizeDataModal").modal("show");
+    if (csv.data().length) {
+      $("#visualizeDataModal").modal("show");
+    }
   }
 
     // All HTML initialization /events configuration of the page
@@ -19,8 +21,7 @@ define(['domReady','csv','bootable','map','modals' ],function( domeady, csv, boo
 
        // Scrolls to menu item 
           $('a[href*=#]:not([href=#])').click(function() {
-              if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') || location.hostname == this.hostname) {
-
+              if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') || location.hostname == this.hostname) {
                   var target = $(this.hash);
                   target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
                   if (target.length) {
@@ -33,12 +34,14 @@ define(['domReady','csv','bootable','map','modals' ],function( domeady, csv, boo
           });
 
   function openFetchDataModal(){
-    if(csv.data().length) {
+    if (csv.data().length) {
       modals.confirm("Data available. Would you delete current data?")
         .yes(function(){removeData();$("#fetchDataModal").modal("show");})
         .no(openVisualizeDataModal); // show current data
     }
-    else $("#fetchDataModal").modal("show");
+    else {
+      $("#fetchDataModal").modal("show");
+    }
   }
 
 

@@ -19,9 +19,8 @@ define(function(  ) {
         return {
           yes:function(e){yes=e; return this;},
           no:function(e){no=e; return this;}
-        }
-
-      }
+        };
+      };
 
   return exports;
 

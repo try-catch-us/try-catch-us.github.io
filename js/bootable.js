@@ -19,21 +19,21 @@ define(['types','csv'], function( types, csv ) {
         var $body = $table.find("tbody").html("");
         var $header = $("<tr></tr>");
 
-        if (!$table.data("bootable-initialized")) initialize( $table );
+        if (!$table.data("bootable-initialized")) {initialize( $table );}
         // build table header and dropdowns
         $table.find("thead").html("").append($header);
         $header.append( $("<th title='Show/hide markers'><input type='checkbox' checked data-role='selectAll' /></th>") );
         $(data.schema).each(
            function(index,element){
             var $th=$("<th class='dropdown'></th>").data("name",element.name);
-            $th.prepend( $("<ul class='dropdown-menu'>"
-                +"<li><a href='javascript:void(0);' data-role='setLongitude'>Set as Longitude</a></li>"
-                +"<li><a href='javascript:void(0);' data-role='setLatitude'>Set as Latitude</a></li>"
-                +"<li><a href='javascript:void(0);' data-role='setDescription'>Set as Description</a></li>"
-                +"<li><a href='javascript:void(0);' data-role='setLabel'>Set as Marker Label</a></li>"
-                +"<li><a href='javascript:void(0);' data-role='sortAsc'>Sort ascending <i class='fa fa-long-arrow-up'></i></a></li>"
-                +"<li><a href='javascript:void(0);' data-role='sortDesc'>Sort descending <i class='fa fa-long-arrow-down'></i></a></li>"
-                +"</ul>") )
+            $th.prepend( $("<ul class='dropdown-menu'>"+
+                "<li><a href='javascript:void(0);' data-role='setLongitude'>Set as Longitude</a></li>"+
+                "<li><a href='javascript:void(0);' data-role='setLatitude'>Set as Latitude</a></li>"+
+                "<li><a href='javascript:void(0);' data-role='setDescription'>Set as Description</a></li>"+
+                "<li><a href='javascript:void(0);' data-role='setLabel'>Set as Marker Label</a></li>"+
+                "<li><a href='javascript:void(0);' data-role='sortAsc'>Sort ascending <i class='fa fa-long-arrow-up'></i></a></li>"+
+                "<li><a href='javascript:void(0);' data-role='sortDesc'>Sort descending <i class='fa fa-long-arrow-down'></i></a></li>"+
+                "</ul>") );
             $th.prepend( $("<a href='javascript:void(0);' data-toggle='dropdown' data-name='"+element.name+"' class='dropdown-toggle'></a>").text(element.name).append("<span class='caret'></span>") );
             $header.append( $th );
            }); 
@@ -52,13 +52,12 @@ define(['types','csv'], function( types, csv ) {
                  function(index,field){
                   $tr.append( csv.tableCell( record[field.name] ) );
                  });
-              ;
           });
         return {
-        	selectedData:function(){return $.map( $table.find("tbody [data-role='selectRow']:checked").parents("tr") , function(e){return $(e).data("data");})},
+        	selectedData:function(){return $.map( $table.find("tbody [data-role='selectRow']:checked").parents("tr") , function(e){return $(e).data("data");});},
         	columns: function(){return data.specificColumns; },
         	clear: function(){$table.find("tbody,thead").html(""); }
-        }
+        };
 
 
 	      	// create the necessary delegated events for the table.
@@ -72,8 +71,8 @@ define(['types','csv'], function( types, csv ) {
 	          .on("click","a[data-role='sortAsc']", function(){sortTable($table,$(this).parents("th").data("name"), +1 );} )
 	          .on("click","a[data-role='sortDesc']", function(){sortTable($table,$(this).parents("th").data("name"), -1 );} )
 	          .on("click","[data-role='selectRow']", function(){
-	                                                  if ($(this).prop("checked")) $(this).parents('tr').removeClass('warning');
-	                                                  else $(this).parents('tr').addClass('warning');
+	                                                  if ($(this).prop("checked")) {$(this).parents('tr').removeClass('warning');}
+	                                                  else {$(this).parents('tr').addClass('warning');}
 	                                                })
 	          .on("click","[data-role='selectAll']", function(){SelectTableRows($(this).parents('table'),$(this).prop("checked"));})
 	          .data("bootable-initialized", true );
@@ -83,7 +82,7 @@ define(['types','csv'], function( types, csv ) {
       }
 
       function selectionCell(id){
-        var $td = $("<td></td>")
+        var $td = $("<td></td>");
         $td.append( $("<input type='checkbox' checked data-role='selectRow'/>").data("id",id) );
 
         return $td;

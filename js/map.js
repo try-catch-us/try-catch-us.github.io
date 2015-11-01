@@ -15,7 +15,9 @@ define(['csv'], function( csv ) {
     var $element = $("#visualizationAlert");
 
     $element.removeClass('hide').find("[data-role='content']").html( text );
-    if (timeout) setTimeout( function(){$element.addClass('hide');}, timeout );
+    if (timeout) {
+      setTimeout( function(){$element.addClass('hide');}, timeout );
+    }
   }
 
   exports.build = function($element, $controls){
@@ -35,7 +37,7 @@ define(['csv'], function( csv ) {
             map.controls[ $(this).data("position") || google.maps.ControlPosition.TOP_LEFT].push( $(this).get(0));
         });
 
-  }
+  };
 
   exports.showData = function( data, specificColumns ){
         var bounds = new google.maps.LatLngBounds();
@@ -78,7 +80,7 @@ define(['csv'], function( csv ) {
             markers.push( marker );
           });
         map.fitBounds(bounds);
-      }
+      };
 
 
   function clearMarkers(){
